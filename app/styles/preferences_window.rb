@@ -37,7 +37,9 @@ Teacup::Stylesheet.new :preferences_window do
     autoresizingMask: autoresize.fixed_top_left
 
   style :up_method,
-    frame: NSMakeRect(100, 290, 100, 22),
+    frame: NSMakeRect(100, 290, 60, 25),
+    editable: false,
+    selectable: true,
     autoresizingMask: autoresize.fill_top
 
   style :up_host_label, extends: :text,
@@ -56,20 +58,28 @@ Teacup::Stylesheet.new :preferences_window do
     frame: NSMakeRect(100, 230, 300, 22),
     autoresizingMask: autoresize.fill_top
 
-  style :up_path_label, extends: :text,
+  style :up_pass_label, extends: :text,
     frame: NSMakeRect(30, 200, 80, 22),
     autoresizingMask: autoresize.fixed_top_left
 
-  style :up_path,
+  style :up_pass,
     frame: NSMakeRect(100, 200, 300, 22),
     autoresizingMask: autoresize.fill_top
 
-  style :up_url_label, extends: :text,
+  style :up_path_label, extends: :text,
     frame: NSMakeRect(30, 170, 80, 22),
     autoresizingMask: autoresize.fixed_top_left
 
-  style :up_url,
+  style :up_path,
     frame: NSMakeRect(100, 170, 300, 22),
+    autoresizingMask: autoresize.fill_top
+
+  style :up_url_label, extends: :text,
+    frame: NSMakeRect(30, 140, 80, 22),
+    autoresizingMask: autoresize.fixed_top_left
+
+  style :up_url,
+    frame: NSMakeRect(100, 140, 300, 22),
     autoresizingMask: autoresize.fill_top
   
 

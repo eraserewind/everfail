@@ -16,6 +16,11 @@ Motion::Project::App.setup do |app|
   app.version = '0.0.2'
   app.info_plist['NSUIElement'] = 1
 
+  app.pods do
+    pod 'FTPManager'
+    pod 'AFAmazonS3Client'
+  end
+
   app.sparkle do
     # Required setting
     release :base_url, 'http://everfail.apps.rngd.io/releases/current'

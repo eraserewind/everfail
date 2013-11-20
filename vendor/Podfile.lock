@@ -1,0 +1,16 @@
+PODS:
+  - AFAmazonS3Client (0.3.0):
+    - AFNetworking (~> 1.0)
+  - AFNetworking (1.3.3)
+  - FTPManager (1.6.1)
+
+DEPENDENCIES:
+  - AFAmazonS3Client
+  - FTPManager
+
+SPEC CHECKSUMS:
+  AFAmazonS3Client: d1d25681e07c61d138d8c75fce2ace31ef7d4ebf
+  AFNetworking: 0700ec7a58c36ad217173e167f6e4df7270df66b
+  FTPManager: 66349d560df251de73842c7b948ec0ec0825b9f0
+
+COCOAPODS: 0.28.0
