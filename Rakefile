@@ -13,12 +13,14 @@ Motion::Project::App.setup do |app|
   app.name = 'EverFail'
   app.copyright = 'Copyright © 2013 Renegade Replicants. all rights reserved'
   app.identifier = 'net.renegadereplicants.everfail'
-  app.version = '0.0.2'
+  app.version = '0.0.4'
   app.info_plist['NSUIElement'] = 1
+  app.icon = "icon.png"
 
   app.pods do
     pod 'FTPManager'
     pod 'AFAmazonS3Client'
+    pod 'RHPreferences'
   end
 
   app.sparkle do
@@ -28,7 +30,7 @@ Motion::Project::App.setup do |app|
     # Recommended setting
     # This will set both your `app.version` and `app.short_version` to the same value
     # It's fine not to use it, just remember to set both as Sparkle needs them
-    release :version, '0.0.2'
+    release :version, '0.0.4'
 
     # Optional settings and their default values
     release :feed_filename, 'releases.xml'

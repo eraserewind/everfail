@@ -59,7 +59,7 @@ class AppDelegate
     @mainWindow = @controller.window
     @mainWindow.title = appName + " Preferences"
     @mainWindow.styleMask = NSTitledWindowMask | NSClosableWindowMask
-    @mainWindow.makeKeyAndOrderFront(sender)
+    @mainWindow.orderFrontRegardless
   end
 
   private
@@ -75,6 +75,7 @@ class AppDelegate
       tempFile = "#{NSTemporaryDirectory()}#{fileName}"
       system("screencapture #{args} -t png #{tempFile}")
       @item.setTitle("↑")
+      @item.setImage(NSImage.imageNamed("menu-uploading"))
       state, str = upload(fileName, tempFile)
       if state
         uploadSuccess(str)
@@ -86,12 +87,14 @@ class AppDelegate
 
   def uploadSuccess(str)
     @item.setTitle("")
+    @item.setImage(NSImage.imageNamed("menu"))
     pasteToClipboard(str) if prefs.boolForKey('copy')
     sendNotification("Screenshot uploaded", "#{str} (copied)") if prefs.boolForKey('notificationcenter')
   end
 
   def uploadFailure(str)
     @item.setTitle("!")
+    @item.setImage(NSImage.imageNamed("menu-error"))
     sendNotification("Screenshot upload failure", str)
   end
 
