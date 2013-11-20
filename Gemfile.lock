@@ -1,10 +1,14 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    motion-sparkle (0.0.3)
     rake (10.1.0)
+    teacup (2.1.13)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  motion-sparkle
   rake
+  teacup

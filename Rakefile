@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 $:.unshift("/Library/RubyMotion/lib")
-require 'motion/project/template/osx'
+require_relative 'lib/template_nosign'
 
 begin
   require 'bundler'
@@ -15,4 +15,25 @@ Motion::Project::App.setup do |app|
   app.identifier = 'net.renegadereplicants.everfail'
   app.version = '0.0.1'
   app.info_plist['NSUIElement'] = 1
+
+  app.sparkle do
+    # Required setting
+    release :base_url, 'http://everfail.apps.rngd.io/releases/current'
+
+    # Recommended setting
+    # This will set both your `app.version` and `app.short_version` to the same value
+    # It's fine not to use it, just remember to set both as Sparkle needs them
+    release :version, '0.0.1'
+
+    # Optional settings and their default values
+    release :feed_filename, 'releases.xml'
+    release :notes_filename, 'release_notes.html'
+    release :package_filename, "#{app.name}.zip"
+    release :public_key, 'dsa_pub.pem'
+
+  end
+end
+
+task :scp_release do
+  `scp sparkle/release/* nibiru:/storage1/jordan/sites/everfail.apps.rngd.io/releases/current`
 end
