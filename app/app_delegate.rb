@@ -55,6 +55,17 @@ class AppDelegate
   end
 
   def openPreferences(sender)
+    unless @preferencesWindowController
+      settings = PreferencesSettingsController.new
+      accounts = PreferencesAccountsController.new
+      #controllers = [settings, accounts]
+      controllers = [settings, accounts, RHPreferencesWindowController.flexibleSpacePlaceholderController]
+      @preferencesWindowController = RHPreferencesWindowController.alloc.initWithViewControllers(controllers, andTitle: "Preferences")
+    end
+    @preferencesWindowController.showWindow(self)
+  end
+
+  def openOldPreferences(sender)
     @controller = PreferencesController.new
     @mainWindow = @controller.window
     @mainWindow.title = appName + " Preferences"
