@@ -3,7 +3,8 @@ class AppDelegate
     buildMenu
     #buildWindow
     buildStatus(setupMenu)
-    prefs.registerDefaults({ 'notificationcenter' => true, 'copy' => true, 'up_pass' => '', 'up_user' => '', 'up_method' => '', 'up_path' => '', 'up_url' => '' })
+    prefs.registerDefaults({ 'notify' => true, 'copy' => true, 'open_url' => false, 'sound' => false, 'format' => 'png',
+      'up_pass' => '', 'up_user' => '', 'up_method' => '', 'up_path' => '', 'up_url' => '', 'scp_opts' => '' })
   end
 
   def buildStatus(menu)
@@ -31,7 +32,7 @@ class AppDelegate
     menu.addItem createMenuItem('Fullscreen Screenshot', 'screenshotScreen:')
 
     menu.addItem NSMenuItem.separatorItem
-    menu.addItem createMenuItem('Preferences', 'openPreferences:')
+    menu.addItem createMenuItem('Preferences', 'showPreferences:')
     menu.addItem sparklezMenuItemz
     menu.addItem NSMenuItem.separatorItem
 
@@ -43,25 +44,26 @@ class AppDelegate
   end
 
   def screenshotScreen(sender)
-    takeScreenshot(sender)
+    takeScreenshot(sender, '-w -S')
   end
 
   def screenshotWindow(sender)
-    takeScreenshot(sender, '-W')
+    takeScreenshot(sender, '-w')
   end
 
   def screenshotSelection(sender)
     takeScreenshot(sender, '-i')
   end
 
-  def openPreferences(sender)
+  def showPreferences(sender)
     unless @preferencesWindowController
-      settings = PreferencesSettingsController.new
-      accounts = PreferencesAccountsController.new
-      #controllers = [settings, accounts]
-      controllers = [settings, accounts, RHPreferencesWindowController.flexibleSpacePlaceholderController]
+      settings = SettingsController.new
+      accounts = AccountsController.new
+      controllers = [settings, accounts]
       @preferencesWindowController = RHPreferencesWindowController.alloc.initWithViewControllers(controllers, andTitle: "Preferences")
     end
+    @preferencesWindowController.showWindow(self)
+    @preferencesWindowController.showWindow(self)
     @preferencesWindowController.showWindow(self)
   end
 
@@ -82,9 +84,24 @@ class AppDelegate
   def takeScreenshot(sender, args='-i')
     Dispatch::Queue.concurrent.async do
       @item.setTitle("")
-      fileName = "#{appName.downcase}_#{Time.now.to_i}.png"
+      fileName = "#{appName.downcase}_#{Time.now.to_i}.#{prefs.stringForKey('format')}"
       tempFile = "#{NSTemporaryDirectory()}#{fileName}"
-      system("screencapture #{args} -t png #{tempFile}")
+      nosoundarg = prefs.boolForKey('sound') ? "" : "-x"
+      command = "/usr/sbin/screencapture #{args} -t #{prefs.stringForKey('format')} #{nosoundarg} #{tempFile}"
+      NSLog("ScreenCapture command: #{command.inspect}")
+      reason = "no output"
+      out = IO.popen(command) { |line|
+        str = line.read.to_s
+        NSLog("ScreenCapture: out: #{str}")
+        reason = str
+      }
+      process = $?
+      if process.exitstatus > 0
+        NSLog("Screencapture failed #{process.exitstatus}")
+        sendNotification("Screen Capture error", "Exit #{process.exitstatus}: #{reason}")
+        return
+      end
+
       @item.setTitle("↑")
       @item.setImage(NSImage.imageNamed("menu-uploading"))
       state, str = upload(fileName, tempFile)
@@ -100,7 +117,8 @@ class AppDelegate
     @item.setTitle("")
     @item.setImage(NSImage.imageNamed("menu"))
     pasteToClipboard(str) if prefs.boolForKey('copy')
-    sendNotification("Screenshot uploaded", "#{str} (copied)") if prefs.boolForKey('notificationcenter')
+    sendNotification("Screenshot uploaded", "#{str} (copied)") if prefs.boolForKey('notify')
+    NSWorkspace.sharedWorkspace.openURL(NSURL.URLWithString(str)) if prefs.boolForKey('open_url')
   end
 
   def uploadFailure(str)
@@ -131,8 +149,8 @@ class AppDelegate
 
   def uploadSCP(name, file, prefz)
     unless prefz[:user].empty? && prefz[:host].empty? && prefz[:path].empty? && prefz[:url].empty?
-      command = "scp #{file} #{prefz[:user]}@#{prefz[:host]}:#{prefz[:path]} 2>&1"
-      NSLog("SCP: Running '#{command}'")
+      command = "scp #{prefs.stringForKey('scp_opts')} #{file} #{prefz[:user]}@#{prefz[:host]}:#{prefz[:path]} 2>&1"
+      NSLog("SCP: Running #{command.inspect}")
       reason = "no output"
       out = IO.popen(command) { |line|
         str = line.read.to_s
@@ -204,7 +222,7 @@ class AppDelegate
     notif = NSUserNotification.alloc.init
     notif.setTitle(title)
     notif.setInformativeText(text)
-    notif.setSoundName(NSUserNotificationDefaultSoundName)
+    notif.setSoundName(NSUserNotificationDefaultSoundName) if prefs.boolForKey('sound')
     center = NSUserNotificationCenter.defaultUserNotificationCenter
     center.deliverNotification(notif)
   end

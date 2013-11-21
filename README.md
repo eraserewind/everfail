@@ -4,6 +4,8 @@
 
 * **notify**, boolean, default true. Send a notification to the notification center
 * **copy**, boolean, default true. Copy the screenshot URI to the clipboard
+* **open_browser**, boolean, default false. Open the URI in default browser after upload.
+* **format**, string, default png. Screenshot format. png gif jpg tiff
 * **up_method**, string. Upload method (scp, ftp, ...)
 * **up_host**, string. Upload hostname.
 * **up_user**, string. Upload user-name.
