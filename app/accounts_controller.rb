@@ -17,7 +17,7 @@ class AccountsController < TeacupWindowController
 
     %w(host user pass path url).each do |f|
       subview(NSTextField, "up_#{f}_label".to_sym, stringValue: f.capitalize)
-      @strings["up_#{f}"] = subview(NSTextField, "up_#{f}".to_sym, stringValue: prefs.stringForKey("up_#{f}"))
+      @strings["up_#{f}"] = subview(NSTextField, "up_#{f}".to_sym, stringValue: prefs.stringForKey("up_#{f}") || '')
     end
 
     comboBoxSelectionDidChange
