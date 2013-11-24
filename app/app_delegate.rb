@@ -1,7 +1,6 @@
 class AppDelegate
   def applicationDidFinishLaunching(notification)
     buildMenu
-    #buildWindow
     buildStatus(setupMenu)
     prefs.registerDefaults({ 'notify' => true, 'copy' => true, 'open_url' => false, 'sound' => false, 'format' => 'png',
       'up_pass' => '', 'up_user' => '', 'up_method' => '', 'up_path' => '', 'up_url' => '', 'scp_opts' => '' })
@@ -148,20 +147,41 @@ class AppDelegate
   end
 
   def uploadSCP(name, file, prefz)
-    unless prefz[:user].empty? && prefz[:host].empty? && prefz[:path].empty? && prefz[:url].empty?
-      command = "scp #{prefs.stringForKey('scp_opts')} #{file} #{prefz[:user]}@#{prefz[:host]}:#{prefz[:path]} 2>&1"
-      NSLog("SCP: Running #{command.inspect}")
-      reason = "no output"
-      out = IO.popen(command) { |line|
-        str = line.read.to_s
-        NSLog("SCP: out: #{str}")
-        reason = str
-      }
-      process = $?
-      if process.exitstatus > 0
-        [ false, "SCP Error (#{process.exitstatus}): #{reason}" ]
+    unless prefz[:user].empty? && prefz[:host].empty? && prefz[:path].empty? && prefz[:url].empty? && prefz[:pass].empty?
+      host_can_use_publickey = false # TODO support keys
+      NSLog("SCP to #{prefz[:user]}@#{prefz[:host]}")
+      session = NMSSHSession.connectToHost(prefz[:host], withUsername: prefz[:user])
+      if session.isConnected
+        methods = session.supportedAuthenticationMethods
+        if methods.include?("password")
+          session.authenticateByPassword(prefz[:pass])
+        # TODO: Support keys authentication
+        elsif methods.include?("publickey") && host_can_use_publickey == true
+          NSLog("TODO: Add publickey support :)")
+        # TODO: Really support keyboard interactive (ask the user if pass is empty or other request
+        elsif methods.include?("keyboard-interactive")
+          NSLog("SCP: Authenticating by keyboard interactive.")
+          session.authenticateByKeyboardInteractiveUsingBlock(lambda do |request|
+            NSLog("Keyboard interactive request: #{request}")
+            prefz[:pass] if request == 'Password:'
+          end)
+        else
+          return [ false, "Unsupported SSH authentication methods (#{methods.join(',')}" ]
+        end
+
+        if session.isAuthorized
+          NSLog("SCP authenticated!")
+        else
+          return [ false, "SCP Authorization failure" ]
+        end
+      end
+
+      success = session.channel.uploadFile(file, to: prefz[:path])
+      session.disconnect
+      if success
+        [ true, buildUrlFor(name) ]
       else
-        [true, buildUrlFor(name)]
+        [ false, "SCP upload failed" ]
       end
     else
       [false, "SCP misconfigured :("]
@@ -237,6 +257,16 @@ class AppDelegate
     sparkle = createMenuItem("Check for updates...", nil)
     sparkle.setTarget SUUpdater.new
     sparkle.setAction 'checkForUpdates:'
+  end
+
+  # Alert window
+  def buildAlertWindow
+    @alertWindow = NSWindow.alloc.initWithContentRect([[240, 180], [480, 360]],
+      styleMask: NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask,
+      backing: NSBackingStoreBuffered,
+      defer: false)
+    @alertWindow.title = NSBundle.mainBundle.infoDictionary['CFBundleName']
+    @alertWindow.orderFrontRegardless
   end
 
 end

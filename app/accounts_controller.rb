@@ -40,12 +40,12 @@ class AccountsController < TeacupWindowController
     else
       method = @strings["up_method"].stringValue
     end
-    case method
-    when "SCP"
-      @strings["up_pass"].setEnabled(false) if @strings["up_pass"]
-    else
-      @strings["up_pass"].setEnabled(true) if @strings["up_pass"]
-    end
+    #case method
+    #when "SCP"
+    #  @strings["up_pass"].setEnabled(false) if @strings["up_pass"]
+    #else
+    #  @strings["up_pass"].setEnabled(true) if @strings["up_pass"]
+    #end
   end
 
   def identifier

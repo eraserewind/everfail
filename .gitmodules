@@ -1,0 +1,3 @@
+[submodule "vendor/NMSSH"]
+	path = vendor/NMSSH
+	url = https://github.com/Lejdborg/NMSSH.git

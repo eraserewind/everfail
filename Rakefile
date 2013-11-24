@@ -13,7 +13,7 @@ Motion::Project::App.setup do |app|
   app.name = 'EverFail'
   app.copyright = 'Copyright © 2013 Renegade Replicants. all rights reserved'
   app.identifier = 'net.renegadereplicants.everfail'
-  app.version = '0.0.6'
+  app.version = '0.0.7'
   app.info_plist['NSUIElement'] = 1
   app.icon = "icon.png"
 
@@ -23,6 +23,9 @@ Motion::Project::App.setup do |app|
     pod 'RHPreferences'
   end
 
+#  app.vendor_project( "vendor/NMSSH", :xcode, xcodeproj: "NMSSH.xcodeproj", target: "NMSSH")
+  app.embedded_frameworks = ["vendor/NMSSH.framework"]
+
   app.sparkle do
     # Required setting
     release :base_url, 'http://everfail.apps.rngd.io/releases/current'
@@ -30,7 +33,7 @@ Motion::Project::App.setup do |app|
     # Recommended setting
     # This will set both your `app.version` and `app.short_version` to the same value
     # It's fine not to use it, just remember to set both as Sparkle needs them
-    release :version, '0.0.6'
+    release :version, '0.0.7'
 
     # Optional settings and their default values
     release :feed_filename, 'releases.xml'
