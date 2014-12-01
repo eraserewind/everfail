@@ -1,4 +1,4 @@
-# EverFail — a skitch alternative.
+# EverFail — a very quick'n'dirty skitch alternative.
 
 ## Configuration settings
 
@@ -14,6 +14,5 @@
 
 ---
 
-(c) 2013 Jordan Bracco <j+everfail@rngd.io>
-(c) 2013 Renegade Replicants <http://renegade-replicants.net>
+(c) 2013 Jordan Bracco <jordan+everfail@jordan.io>
 
